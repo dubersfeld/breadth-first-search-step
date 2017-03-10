@@ -8,7 +8,7 @@ public class BFSVertex extends Vertex {
 	 * 
 	 */
 	/** all additional fields */   
-	private BFSVertex parent = null;
+	private Integer parent = null;
 	private Color color = Color.BLACK;
 	private int d = 0;
 	
@@ -24,11 +24,11 @@ public class BFSVertex extends Vertex {
 	}
 	
 	
-	public Vertex getParent() {
+	public Integer getParent() {
 		return parent;
 	}
 
-	public void setParent(BFSVertex parent) {
+	public void setParent(Integer parent) {
 		this.parent = parent;
 	}
 

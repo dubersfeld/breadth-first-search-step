@@ -37,8 +37,8 @@ public class BFSController {
 			int from = jsonEdges.get(i).getFrom();
 			int to = jsonEdges.get(i).getTo();
 			Vertex v1 = graph.getVertices().get(from);
-			Vertex v2 = graph.getVertices().get(to);
-			v1.getAdjacency().add(v2);
+			//Vertex v2 = graph.getVertices().get(to);
+			v1.getAdjacency().add(to);
 		}
 	
 		HttpSession session = request.getSession();

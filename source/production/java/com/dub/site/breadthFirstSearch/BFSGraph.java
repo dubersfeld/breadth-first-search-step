@@ -1,7 +1,6 @@
 package com.dub.site.breadthFirstSearch;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 
 /** for the stepwise implementation the queue has to be a field */
@@ -14,7 +13,7 @@ public class BFSGraph extends Graph implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/** all additional fields for BFS implementation */
-	private Queue<Vertex> queue;
+	private Queue<Integer> queue;
 	
 	private boolean init;
 	
@@ -38,14 +37,6 @@ public class BFSGraph extends Graph implements Serializable {
 		}
 	}
 
-	
-	public Queue<Vertex> getQueue() {
-		return queue;
-	}
-
-	public void setQueue(Queue<Vertex> queue) {
-		this.queue = queue;
-	}
 
 	public boolean isInit() {
 		return init;
@@ -57,22 +48,23 @@ public class BFSGraph extends Graph implements Serializable {
 
 
 	public void searchInit(String vertexName) {
-		Vertex source = null;
-		Iterator<Vertex> iter = vertices.iterator();
-		while (iter.hasNext()) {
-			source = iter.next();
-			if (source.getName().equals(vertexName)) {
-				queue.push_back(source);
+		
+		int lind = 0;
+		
+		for (lind = 0; lind < this.vertices.size(); lind++) {
+			if (this.vertices.get(lind).getName().equals(vertexName)) {
+				queue.push_back(lind);
 				System.out.println("Start search from: " 
-												+ source.getName());
+											+ this.vertices.get(lind).getName());
 				break;
 			}
-		}
-		if (!iter.hasNext()) {
+		}// for
+		
+		if (lind == this.vertices.size()) {
 			throw new RuntimeException("initialization error");
 		}
+		
 		init = true;
-		System.out.println("searchInit completed " + queue.isEmpty());
 	}
 	
 	public StepResult searchStep() {
@@ -84,19 +76,20 @@ public class BFSGraph extends Graph implements Serializable {
 			return result;
 		}
 		
-		Vertex u = queue.pop_front();
-		List<Vertex> adj = u.getAdjacency();
+		Integer index = queue.pop_front();
+		List<Integer> adj = this.vertices.get(index).getAdjacency();
+		BFSVertex u = (BFSVertex)this.vertices.get(index);
 		
-		for (Vertex v : adj) {
-			if (((BFSVertex)v).getColor().equals(BFSVertex.Color.BLACK)) {
-				((BFSVertex)v).setColor(BFSVertex.Color.GREEN);
-				((BFSVertex)v).setD(((BFSVertex)u).getD() + 1);
-				((BFSVertex)v).setParent((BFSVertex)u);
-				queue.push_back(v);
+		for (Integer vi : adj) {
+			BFSVertex v = (BFSVertex)this.vertices.get(vi);
+			if (v.getColor().equals(BFSVertex.Color.BLACK)) {
+				v.setColor(BFSVertex.Color.GREEN);
+				v.setD(((BFSVertex)u).getD() + 1);
+				v.setParent(index);
+				queue.push_back(vi);
 			}
 		}
 		
-		System.out.println(u.getName() + " becomes blue");
 		((BFSVertex)u).setColor(BFSVertex.Color.BLUE);
 		
 		this.display();

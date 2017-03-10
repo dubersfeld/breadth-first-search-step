@@ -15,15 +15,15 @@ public class Vertex {
 	protected String name = "";   
 	
 	@JsonIgnore
-	protected List<Vertex> adjacency;// all adjacent vertices, unused in AJAX response
+	protected List<Integer> adjacency;// all adjacent vertices, unused in AJAX response
 	
 	public Vertex() {
-		adjacency = new ArrayList<Vertex>();
+		adjacency = new ArrayList<Integer>();
 	}
 	
 	public Vertex(Vertex source) {
 		this.name = source.name;
-		this.adjacency = new ArrayList<Vertex>();
+		this.adjacency = new ArrayList<Integer>();
 		for (int i = 0; i < source.adjacency.size(); i++) {
 			this.adjacency.add(source.adjacency.get(i));
 		}
@@ -39,33 +39,11 @@ public class Vertex {
 	
 	
 
-	public List<Vertex> getAdjacency() {
+	public List<Integer> getAdjacency() {
 		return adjacency;
 	}
 
-	public void setAdjacency(List<Vertex> adjacency) {
+	public void setAdjacency(List<Integer> adjacency) {
 		this.adjacency = adjacency;
 	}
-
-
-	/*
-	public Vertex clone() {
-		Vertex v = new Vertex();
-		v.name = name;
-		v.parent = parent;
-		v.color = color;
-		v.d = d;
-		v.adjacency = new ArrayList<>();
-		v.adjacency.addAll(adjacency);
-		return v;
-	}
-	*/
-	
-
-	/*
-	public static enum Color {
-		BLACK, GREEN, BLUE
-	}
-	*/
-
 }
