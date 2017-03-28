@@ -3,7 +3,6 @@ package com.dub.site.breadthFirstSearch;
 import java.util.ArrayList;
 import java.util.List;
 
-// POJO
 /** We need to pass a both a list of vertices and a list of edges */
 public class GraphInitRequest {
 	

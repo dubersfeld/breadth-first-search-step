@@ -1,8 +1,6 @@
 package com.dub.site.breadthFirstSearch;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /** Graph has Vertices and Adjacency Lists */
@@ -13,20 +11,33 @@ public class Graph implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected List<Vertex> vertices;
+	protected Vertex[] vertices;
+	protected int N;
 	
 	
-	public Graph() {
-		vertices = new ArrayList<>();
+	public Graph(int N) {
+		this.N = N;
+		vertices = new Vertex[N];
 	}
 	
-	public List<Vertex> getVertices() {
+	public Vertex[] getVertices() {
 		return vertices;
 	}
-	public void setVertices(List<Vertex> vertices) {
+
+	public void setVertices(Vertex[] vertices) {
 		this.vertices = vertices;
 	}
+
+	public int getN() {
+		return N;
+	}
+
+	public void setN(int n) {
+		N = n;
+	}
+
 	
+
 	public void display() {// used for debugging only
 		for (Vertex v : vertices) {
 			System.out.println(v.getName());

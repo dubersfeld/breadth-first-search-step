@@ -105,12 +105,18 @@ function canvasApp() {
 
   	var names = ["a", "b", "c", "d", "e", "f" ,"g"];
  
+  	var delay = 1000;// for animation only
+
   	var N = 35;// number of vertices
 
   	var Nedges = 30;// number of edges
 
   	var graph = new Graph(N);// empty graph
+  	var queue = [];// use push and shift for a queue
+  	var results = [];// holds the search result collection
 
+  	var animIndex;
+  
   	var src = null;// source
 
   	function setTextStyle() {
@@ -143,6 +149,7 @@ function canvasApp() {
 
 
   	function drawConnect(v1, v2) { 
+  		// here v1 and v2 are vertices, not indices
     	if (v1 == v2.mParent || v2 == v1.mParent) {
       		context.strokeStyle = "blue";
     	} else {
@@ -201,7 +208,7 @@ function canvasApp() {
   
 	}// build
 
-  	function redraw(graph) {
+  	function redraw() {
     	// only use mAdj for drawing connections
     	// clear canvas
     	fillBackground();
@@ -225,6 +232,7 @@ function canvasApp() {
         		drawConnect(graph.mV[i], graph.mV[conn[k]]);        
       		}
     	}
+    	console.log("redraw completed");
  	}// redraw
 
   	function randomize(graph, Nedges) {
@@ -290,11 +298,12 @@ function canvasApp() {
     	var disp;
     
     	redraw(graph);
-    	$('#vertexForm').find(':submit')[0].disabled = false;   
+    	$('#initColl').find(':submit')[0].disabled = false;
+    
 		$('#status').text('Ready to search');
  	}// randomize
 
- 	
+  
 	function validSource(sourcename) {
 		var i;
     	// validity check
@@ -311,6 +320,7 @@ function canvasApp() {
       		}// for    
       		if (i == 35) {
         		// not found
+        		$('#sourcevertex').find(':submit')[0].disabled = false;
         		alert("vertex not found");
         		return false;
       		} else {
@@ -319,7 +329,63 @@ function canvasApp() {
       		}// if
  		}// if
 	}// validSource
-  	  
+	
+	
+	function initColl() {
+		console.log("initColl");
+		sourcename = $("#initColl input[name='sourcename']").val();
+		console.log("search with source: " + sourcename);
+		
+		if (!validSource(sourcename)) { return; }
+		
+		var message;
+	    
+    	var edgeArray = [];
+    	var vertexArray = [];
+    
+    	var count = 0;
+    	var edges;
+    	var vertices;
+  		
+    	for (var j = 0; j < 35; j++) {// for each vertex
+  			vertexArray.push({"name":graph.mV[j].mName});
+  			for (var i = 0; i < graph.mAdj[j].length; i++) {// for each adjacent vertex
+  				edgeArray.push({"from":j, "to":graph.mAdj[j][i]});
+  			}// i
+    	}// j
+  		   
+    	edges = {"jsonEdges":edgeArray};
+    	vertices = {"jsonVertices":vertexArray};
+    
+    	message = {"jsonEdges":edgeArray, "jsonVertices":vertexArray, 
+    							"sourcename":sourcename};
+    
+		console.log(message);
+		
+    	$.ajax({
+			type : "POST",
+			contentType : "application/json",
+			url : '<c:url value="/initGraph" />',
+			data : JSON.stringify(message),
+			dataType : 'json',
+			timeout : 100000,
+			success : function(data) {
+				console.log("INITIALIZATION SUCCESSFUL");
+				//$('#searchColl').find(':submit')[0].disabled = false;
+		  		$('#stepForm').find(':submit')[0].disabled = false;
+			},
+		
+			error : function(e) {
+				console.log("ERROR: ", e);
+			},
+			done : function(e) {
+				console.log("DONE");
+			}
+		});
+  
+	}// initColl
+  	
+	
 	build(graph, Nedges);
   
 	var message;
@@ -338,60 +404,14 @@ function canvasApp() {
 		}// i
   	}// j
 
-  	function stepInit(graph) {
-	  	sourcename = $("#vertexForm input[name='sourcename']").val();
-	  	$('#stepForm').find(':submit')[0].disabled = false;
-	  
-	  	if (!validSource(sourcename)) { return; }
-	  
-	  	var message;
-	  
-	  	var edgeArray = [];
-	  	var vertexArray = [];
-	  
-	  	var count = 0;
-	  	var edges;
-	  	var vertices;
-			
-	 	for (var j = 0; j < 35; j++) {// for each vertex
-			vertexArray.push({"name":graph.mV[j].mName});
-			for (var i = 0; i < graph.mAdj[j].length; i++) {// for each adjacent vertex		
-				edgeArray.push({"from":j, "to":graph.mAdj[j][i]});
-			}// i
-	  	}// j
-			  
-	  	edges = {"jsonEdges":edgeArray};
-	  	vertices = {"jsonVertices":vertexArray};
-	   
-	  	message = {"jsonEdges":edgeArray, "jsonVertices":vertexArray, 
-			  "sourcename":sourcename};
-	  
-	  	$.ajax({
-			type : "POST",
-			contentType : "application/json",
-			url : '<c:url value="/initGraph" />',
-			data : JSON.stringify(message),
-			dataType : 'json',
-			timeout : 100000,
-			success : function(data) {
-				console.log("INITIALIAZATION SUCCESSFUL");
-			},
-			
-			error : function(e) {
-				console.log("ERROR: ", e);
-			},
-			done : function(e) {
-				console.log("DONE");
-			}
-		});
-	   
-	  	console.log("stepInit completed");
-  	}
   
-  	function searchStep(graph) {// change this name in the final version
+  	function searchStep() {
 	  	console.log("debug step begin");
   
   	  	message = {"type":"STEP"};// minimal message
+  	  	
+  		$('#initColl').find(':submit')[0].disabled = true;
+	 	$('#stepForm').find(':submit')[0].disabled = true;
   	  
 	  	$.ajax({
 			type : "POST",
@@ -405,19 +425,22 @@ function canvasApp() {
 					
 				if (data["status"] == "STEP") {
 					// data is a StepResult container so we extract the graph attribute
-					var stepVertices = data["graph"]["vertices"];
+					var stepVertices = data["snapshot"]["vertices"];
+					console.log("stepVertices " + stepVertices.length);
 					for (var i = 0; i < stepVertices.length; i++) {
-						graph.mV[i].mColor = stepVertices[i].color;// update graph
+			      		graph.mV[i].mColor = stepVertices[i].color;// update graph
 						graph.mV[i].mDistance = stepVertices[i].d;
-					}
+			      		// here stepVertices[i].parent is an indice
+			      		graph.mV[i].mParent = graph.mV[stepVertices[i].parent];
+			  		}// for
 					
 					redraw(graph);
 					$('#status').text('Searching...');
+				 	$('#stepForm').find(':submit')[0].disabled = false;
 				} else if (data["status"] == "FINISHED") {
-					$('#vertexForm').find(':submit')[0].disabled = true;
 					console.log("Search completed");
+			  		//$('#stepForm').find(':submit')[0].disabled = true;
 					$('#status').text('Search completed');
-					$('#stepForm').find(':submit')[0].disabled = true;
 				}
 			},
 			
@@ -431,15 +454,14 @@ function canvasApp() {
 	  
   	}
  
+	$("#initColl").submit(function(event) { initColl(graph); return false; });
   	$("#initelem").submit(function(event) { randomize(graph, Nedges); return false; }); 
   	$('#initelem').find(':submit')[0].disabled = false;
-  	$('#stepForm').find(':submit')[0].disabled = true;
+  	$('#initColl').find(':submit')[0].disabled = false;    
   	$("#stepForm").submit(function(event) { searchStep(graph); return false; });
-  	$("#vertexForm").submit(function(event) { stepInit(graph); return false; });
 }// canvasApp
 
 $(document).ready(canvasApp);
-
 
 </script>
 </head>
@@ -456,9 +478,9 @@ $(document).ready(canvasApp);
 <p>I present here a Java based demonstration of the Breadth First Search algorithm.<br>
 I follow closely the approach of Cormen in his classical textbook.</p>
 <h2>Explanations</h2>
-<p>The graph edges are randomly initialized. You can select the source vertex by entering its name. Then you can choose between two demonstration modes:
-In stepwise mode a new request is sent to the server on each step that sends a response that is used to update the graph.
-In animation mode a single request is sent to the server and the response is used in an automatic animation.<br>
+<p>The graph edges are randomly initialized. You can select the source vertex by entering its name.
+A single search request is sent to the server that sends back a response containing a collection of all intermediate search step results.<br/>
+The response is used in an automatic animation.<br>
 All newly discovered vertices are colored in green. When the search is completed all connected vertices are blue and the edges that belong to the Breadth First Tree are blue. The distance of each vertex to the source vertex is also displayed.<br>
 The animation speed can be changed at any time using the range control.</p>
 </header>
@@ -474,27 +496,28 @@ The animation speed can be changed at any time using the range control.</p>
 </div>
 
 <div id="controls">
-  <div id="stepwise">
-  <h3>Stepwise mode</h3>
-   	<form name="step" id="stepForm">
+  <div id="sourceselect">
+    <h3>Step-by-step mode</h3>
+      <form name="initColl" id="initColl">
+        Source vertex: <input type="text" name="sourcename" size="2">
+        <input type="submit" name="source-btn" value="Enter">
+      </form>
+      <form name="stepForm" id="stepForm">
         Click to step:
         <input type="submit" name="step-btn" value="Step">
-    </form>
-    <form name="step" id="vertexForm">
-        Source vertex: <input type="text" name="sourcename" size="2">
-        <input type="submit" name="step-btn" value="Enter">
-    </form>
-  </div>
-  
-  <div id="randomize">
+      </form>
+      <p id="found"></p>
+    </div>
+    <div id="randomize">
       <p>Click here to randomize the graph edges</p>
       <form name="initialize" id="initelem">
         <input type="submit" name="randomize-btn" value="Randomize">
       </form>
-  </div>  
-  <div id="msg">
+    </div>
+    <div id="msg">
     <p id="status"></p>
-  </div> 
+    </div> 
+
 </div>
 
 </body>

@@ -1,20 +1,15 @@
 package com.dub.site.breadthFirstSearch;
 
 
-/** Vertex has an adjacency list of vertices */
 public class BFSVertex extends Vertex {
 
 	/**
-	 * 
+	 * Subclass used for BFS 
 	 */
-	/** all additional fields */   
+	// all additional fields    
 	private Integer parent = null;
 	private Color color = Color.BLACK;
 	private int d = 0;
-	
-	public BFSVertex() {
-		super();
-	}
 	
 	public BFSVertex(BFSVertex source) {// deep copy c'tor
 		super(source);
@@ -23,6 +18,19 @@ public class BFSVertex extends Vertex {
 		this.d = source.d;
 	}
 	
+
+	public BFSVertex() {
+		super();
+	}
+	
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 	
 	public Integer getParent() {
 		return parent;
@@ -48,7 +56,6 @@ public class BFSVertex extends Vertex {
 		this.d = d;
 	}
 
-	
 
 	public static enum Color {
 		BLACK, GREEN, BLUE

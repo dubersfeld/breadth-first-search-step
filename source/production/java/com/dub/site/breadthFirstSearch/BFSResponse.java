@@ -8,7 +8,7 @@ import java.util.List;
  **/
 public class BFSResponse {
 	private Status status;
-	private List<StepResult> snapshots;
+	private List<JSONSnapshot> snapshots;
 	
 
 	public BFSResponse() {
@@ -24,16 +24,17 @@ public class BFSResponse {
 		this.status = status;
 	}
 
-	public List<StepResult> getSnapshots() {
+	public List<JSONSnapshot> getSnapshots() {
 		return snapshots;
 	}
 
-	public void setSnapshots(List<StepResult> snapshots) {
+	public void setSnapshots(List<JSONSnapshot> snapshots) {
 		this.snapshots = snapshots;
 	}
 
 
-	
+
+
 
 	public static enum Status {
 		OK, ERROR

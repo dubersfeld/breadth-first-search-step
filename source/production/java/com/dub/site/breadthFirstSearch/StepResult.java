@@ -3,17 +3,17 @@ package com.dub.site.breadthFirstSearch;
 /** container for AJAX response */
 public class StepResult {
 	
-	private BFSGraph graph;
+	private JSONSnapshot snapshot;
 	private Status status;
 	
 
 	
-	public BFSGraph getGraph() {
-		return graph;
+	public JSONSnapshot getSnapshot() {
+		return snapshot;
 	}
 
-	public void setGraph(BFSGraph graph) {
-		this.graph = graph;
+	public void setSnapshot(JSONSnapshot snapshot) {
+		this.snapshot = snapshot;
 	}
 
 	public Status getStatus() {
