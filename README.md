@@ -7,8 +7,9 @@ The unoriented graph edges are randomly initialized.
 
 The search itself is step-by-step, each Ajax request resulting in a new vertex discovery executed on server side.
 
-When deployed on Tomcat the context root is:
+To launch the demo run the command `mvn spring-boot:run` in project directory.
 
-localhost:8080/breadth-first-search
+When the application has started open a browser and hit URL `localhost:8080/breadth-first-search`.
+
 
 Dominique Ubersfeld, Cachan, France
